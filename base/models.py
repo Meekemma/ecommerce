@@ -36,13 +36,14 @@ class Product(models.Model):
     title = models.CharField(max_length=50, null=True, blank=True)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    quantity = models.IntegerField()
+    quantity = models.IntegerField(default=0)
     category = models.ForeignKey('Category', on_delete=models.CASCADE, blank=True, null=True)
-    images = models.ImageField(upload_to='product_img/', default="product.jpg", null=True, blank=True)
+    images = models.ImageField(upload_to='product_img/', default="product.png", null=True, blank=True)
     reviews = models.ManyToManyField('Review', related_name='products', blank=True)
 
     def __str__(self):
         return f"{self.title} - {self.price}"
+
 
 class Category(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -51,10 +52,9 @@ class Category(models.Model):
         return self.name
 
 
-
 class Review(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    user = models.ForeignKey('Customer', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey('Customer', on_delete=models.CASCADE,null=True, blank=True)
     rating = models.IntegerField()
     comment = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)

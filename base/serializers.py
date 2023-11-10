@@ -8,21 +8,32 @@ class CustomerSerializer(serializers.ModelSerializer):
         exclude = ['user', 'date_created']
 
 
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Review
+        fields= '__all__'
+
+
 class ProductSerializer(serializers.ModelSerializer):
+    reviews=serializers.SerializerMethodField(read_only=True)
+    reviews_count=serializers.SerializerMethodField(read_only=True)
     class Meta:
         model=Product
         fields='__all__'
+
+    def get_reviews(self, obj):
+        reviews=obj.review_set.all()
+        serializer=ReviewSerializer(reviews, many=True)
+        return serializer.data  
+    
+    def get_reviews_count(self, obj):
+        return obj.review_set.count()  
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model=Category
         fields='__all__'
-
-class ReviewSerializer(serializers.ModelSerializer):
-    class Meta:
-        model=Review
-        exclude = ['user', 'date_created']
 
 class CartSerializer(serializers.ModelSerializer):
     class Meta:

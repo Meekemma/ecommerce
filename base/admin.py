@@ -3,10 +3,6 @@ from .models import *
 
 
 # Register your models here.
-
-
-
-
 class CustomerAdmin(admin.ModelAdmin):
     list_display = ('username', 'first_name', 'last_name', 'email', 'phone_number', 'country')
     list_filter = ('country', 'gender')
@@ -67,10 +63,6 @@ class WishlistAdmin(admin.ModelAdmin):
 class CouponAdmin(admin.ModelAdmin):
     list_display = ('code', 'discount', 'valid_from', 'valid_to')
     
-
-
-
-
 
 admin.site.register(Customer, CustomerAdmin)
 admin.site.register(Product, ProductAdmin)
