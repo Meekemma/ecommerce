@@ -1,11 +1,44 @@
 from rest_framework import serializers
+from django.contrib.auth.models import User
+
 from.models import *
 
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model =User
+        fields = ['id', 'username', 'email', 'password', 'first_name', 'last_name']
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            password=validated_data['password'],
+            first_name=validated_data.get('first_name', ''),
+            last_name=validated_data.get('last_name', '')
+        )
+        return user
+    
+    
+
+
+
+
+
 class CustomerSerializer(serializers.ModelSerializer):
+    country = serializers.SerializerMethodField()
+
+
     class Meta:
         model=Customer
-        exclude = ['user', 'date_created']
+        fields = ['id', 'username','first_name', 'last_name','email', 'phone_number', 'country', 'gender', 'state', 'profile_pic', 'date_created']
+        extra_kwargs = {'user': {'read_only': True}}
+
+    def get_country(self, obj):
+        return obj.country.name if obj.country else None    
+
+        
 
 
 class ReviewSerializer(serializers.ModelSerializer):

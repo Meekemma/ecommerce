@@ -7,7 +7,10 @@ from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
 from .serializers import *
 
+
 # Create your views here.
+
+
 
 
 @api_view(['GET'])
