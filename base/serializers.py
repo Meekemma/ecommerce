@@ -20,11 +20,6 @@ class UserSerializer(serializers.ModelSerializer):
         )
         return user
     
-    
-
-
-
-
 
 class CustomerSerializer(serializers.ModelSerializer):
     country = serializers.SerializerMethodField()
@@ -68,26 +63,38 @@ class CategorySerializer(serializers.ModelSerializer):
         model=Category
         fields='__all__'
 
-class CartSerializer(serializers.ModelSerializer):
-    class Meta:
-        model=Cart
-        fields='__all__' 
-
-class CartItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model=CartItem
-        fields='__all__'
-
 
 class OrderSerializer(serializers.ModelSerializer):
+    total_quantity_in_cart = serializers.SerializerMethodField(read_only=True)
+    cart_total = serializers.SerializerMethodField(read_only=True)
+    
     class Meta:
-        model=Order
-        exclude = ['date_created']
+        model = Order
+        fields = '__all__'
+
+    def get_total_quantity_in_cart(self, obj):
+        order_items = obj.orderitem_set.all()
+        total_quantity = sum([item.quantity for item in order_items])
+        return total_quantity
+    
+    def get_cart_total(self,obj):
+        order_items = obj.orderitem_set.all()
+        cart_total= sum([item.get_item_total() for item in order_items])
+        return cart_total
+
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    item_total=serializers.SerializerMethodField(read_only=True)
+    
     class Meta:
         model=OrderItem
-        exclude = ['date_created']
+        fields = '__all__'
+
+    def get_item_total(self, obj):
+        item_total = obj.product.price * obj.quantity
+        return item_total
+
+
 
 class ShippingAddressSerializer(serializers.ModelSerializer):
     class Meta:

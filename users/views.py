@@ -1,13 +1,14 @@
 from django.shortcuts import render
 from rest_framework import status
-from rest_framework.decorators import api_view,permission_classes
+from rest_framework.decorators import api_view,permission_classes,parser_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from base.serializers import UserSerializer,CustomerSerializer
-from django.contrib.auth.models import User
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
+from django.contrib.auth.models import User
 from base.models import Customer
 
 
@@ -64,29 +65,17 @@ def getUserId(request, pk):
     
 
 
+
 @api_view(['POST', 'PUT'])
 @permission_classes([IsAuthenticated])
+@parser_classes([FormParser, MultiPartParser])
 def createProfile(request):
-    user = request.user
+    if request.method == 'POST' or request.method == 'PUT':
+        user = request.user
+        customer = user.customer  
 
-    try:
-        customer = user.customer
-    except Customer.DoesNotExist:
-        customer = None    
-    if request.method == 'POST':
-        if customer:
-            return Response({'message': 'Customer profile already exists.'}, status=status.HTTP_400_BAD_REQUEST)
         serializer = CustomerSerializer(customer, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    if request.method =='PUT':
-        if not customer:
-            return Response({'message': 'Customer profile does not exist.'}, status=status.HTTP_404_NOT_FOUND)
-        
-        serializer = CustomerSerializer(customer, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)

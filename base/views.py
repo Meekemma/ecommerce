@@ -38,6 +38,7 @@ def createProduct(request):
         price=data['price'],
         quantity=data['quantity'],
         category_id=data['category'],
+        images=data['images']
     )
     serializer = ProductSerializer(product, many=False)
     return Response(serializer.data)

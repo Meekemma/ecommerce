@@ -16,9 +16,9 @@ class Customer(models.Model):
     first_name=models.CharField(max_length=50, null=True, blank=True)
     last_name=models.CharField(max_length=50, null=True, blank=True)
     email=models.EmailField(unique=True, max_length=50)
-    address=models.CharField(max_length=100, null=True, blank=True)
+    address=models.CharField(max_length=200, null=True, blank=True)
     phone_number=models.CharField(max_length=15)
-    country = CountryField()
+    country = models.TextField()
     gender = models.CharField(max_length=10, null=True, blank=True, choices=GENDER)
     state = models.CharField(max_length=50, null=True, blank=True) 
     profile_pic = models.ImageField(upload_to='profile_pics/', default="profile.jpg", null=True, blank=True)
@@ -62,25 +62,6 @@ class Review(models.Model):
     def __str__(self):
         return f"Review for {self.product} by {self.user}"
     
-
-
-
-class Cart(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    products = models.ManyToManyField(Product, through='CartItem')
-
-    def __str__(self):
-        return f"Cart for {self.customer}"
-
-class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField()
-
-    def __str__(self):
-        return f"{self.quantity} of {self.product.title} in Cart for {self.cart.customer}"
-
-
 
 ORDER_STATUS_CHOICES = (
         ('pending', 'Pending'),

@@ -26,17 +26,6 @@ class ReviewAdmin(admin.ModelAdmin):
     search_fields = ('product__title', 'user__username')
 
 
-class CartAdmin(admin.ModelAdmin):
-    list_display = ('customer', )
-    
-
-
-class CartItemAdmin(admin.ModelAdmin):
-    list_display = ('cart', 'product', 'quantity')
-    list_filter = ('cart__customer', 'product__category')
-    search_fields = ('product__title', )
-
-
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('customer', 'total_price', 'order_status', 'date_ordered')
     list_filter = ('order_status', 'customer__country')
@@ -68,8 +57,6 @@ admin.site.register(Customer, CustomerAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Review, ReviewAdmin)
-admin.site.register(Cart, CartAdmin)
-admin.site.register(CartItem, CartItemAdmin)
 admin.site.register(Order, OrderAdmin)
 admin.site.register(OrderItem, OrderItemAdmin)
 admin.site.register(ShippingAddress, ShippingAddressAdmin)
