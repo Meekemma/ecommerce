@@ -63,49 +63,70 @@ class CategorySerializer(serializers.ModelSerializer):
         model=Category
         fields='__all__'
 
-
-class OrderSerializer(serializers.ModelSerializer):
-    total_quantity_in_cart = serializers.SerializerMethodField(read_only=True)
-    cart_total = serializers.SerializerMethodField(read_only=True)
-    
+class ShippingAddressSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Order
-        fields = '__all__'
-
-    def get_total_quantity_in_cart(self, obj):
-        order_items = obj.orderitem_set.all()
-        total_quantity = sum([item.quantity for item in order_items])
-        return total_quantity
-    
-    def get_cart_total(self,obj):
-        order_items = obj.orderitem_set.all()
-        cart_total= sum([item.get_item_total() for item in order_items])
-        return cart_total
+        model=ShippingAddress
+        fields= '__all__'
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
-    item_total=serializers.SerializerMethodField(read_only=True)
-    
+    item_total=serializers.SerializerMethodField()
+    price=serializers.SerializerMethodField()
+    title=serializers.SerializerMethodField()
+    image=serializers.SerializerMethodField()
     class Meta:
         model=OrderItem
         fields = '__all__'
 
     def get_item_total(self, obj):
-        item_total = obj.product.price * obj.quantity
-        return item_total
+        return obj.get_item_total    
 
 
+    def get_price(self, obj):
+        return obj.product.price
+    
+    def get_title(self, obj):
+        return obj.product.title
+    
+    def get_image(self, obj):
+        return obj.product.images.url
 
-class ShippingAddressSerializer(serializers.ModelSerializer):
+
+class OrderSerializer(serializers.ModelSerializer):
+    orderitem_set = OrderItemSerializer(many=True, read_only=True)
+    cart_items=serializers.SerializerMethodField()
+    cart_total=serializers.SerializerMethodField()
+    ShippingAddress=serializers.SerializerMethodField(read_only=True)
+
     class Meta:
-        model=ShippingAddress
-        exclude = ['date_created'] 
+        model = Order
+        fields = '__all__'
+
+    def get_cart_items(self, obj):
+        return obj.get_cart_items
+    
+    def get_cart_total(self, obj):
+        return obj.get_cart_total
+    
+   
+    def get_shippingAddress(self, obj):
+        try:
+            address = ShippingAddressSerializer(obj.shippingaddress, many=False).data
+        except:
+            address = False
+        return address
+
+
+
 
 
 class WishlistSerializer(serializers.ModelSerializer):
+    item = ProductSerializer(read_only=True)
     class Meta:
         model=Wishlist
         fields='__all__'
+
+        
 
 class CouponSerializer(serializers.ModelSerializer):
     class Meta:

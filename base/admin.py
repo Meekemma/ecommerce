@@ -27,14 +27,14 @@ class ReviewAdmin(admin.ModelAdmin):
 
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('customer', 'total_price', 'order_status', 'date_ordered')
-    list_filter = ('order_status', 'customer__country')
+    list_display = ('customer', 'complete', 'date_ordered', 'transaction_id')
+    list_filter = ('complete', 'customer__country')
     search_fields = ('customer__username', )
 
 
 class OrderItemAdmin(admin.ModelAdmin):
     list_display = ('order', 'product', 'quantity', 'date_added')
-    list_filter = ('order__order_status', )
+    list_filter = ('order__complete', )
     search_fields = ('product__title', )
 
 

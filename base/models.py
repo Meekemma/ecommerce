@@ -1,6 +1,6 @@
+import uuid
 from django.db import models
 from django.contrib.auth.models import User
-from django_countries.fields import CountryField
 
 # Create your models here.
 
@@ -61,25 +61,29 @@ class Review(models.Model):
 
     def __str__(self):
         return f"Review for {self.product} by {self.user}"
-    
 
-ORDER_STATUS_CHOICES = (
-        ('pending', 'Pending'),
-        ('processing', 'Processing'),
-        ('shipped', 'Shipped'),
-        ('delivered', 'Delivered'),
-        ('canceled', 'Canceled'),
-    )
 
 class Order(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    items = models.ManyToManyField(Product, through='OrderItem')
-    total_price = models.DecimalField(max_digits=10, decimal_places=2)
-    order_status = models.CharField(max_length=20,choices=ORDER_STATUS_CHOICES,default='pending')
+    complete = models.BooleanField(default=False)
     date_ordered = models.DateTimeField(auto_now_add=True)
+    transaction_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     
     def __str__(self):
         return f"Order for {self.customer}"
+    
+
+    @property
+    def get_cart_items(self):
+        order_items = self.orderitem_set.all()
+        total_quantity = sum([item.quantity for item in order_items])
+        return total_quantity
+    
+    @property
+    def get_cart_total(self):
+        order_items = self.orderitem_set.all()
+        cart_total= sum([item.get_item_total for item in order_items])
+        return cart_total
 
 
 
@@ -92,8 +96,12 @@ class OrderItem(models.Model):
     def __str__(self):
         return f"{self.quantity} of {self.product.title} in Order for {self.order.customer}"
 
+    @property
+    def get_item_total(self):
+        item_total=self.product.price * self.quantity
+        return item_total
 
-
+    
 class ShippingAddress(models.Model):
 	customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
 	order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
