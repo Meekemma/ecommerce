@@ -66,14 +66,14 @@ def createOder(request):
             complete=False
         )
 
-        shipping = ShippingAddress.objects.create(
-            customer=customer,
-            order=order,
-            address=data['ShippingAddress']['address'],
-            city=data['ShippingAddress']['city'],
-            state=data['ShippingAddress']['state'],
-            zipcode=data['ShippingAddress']['zipcode']
-        )
+        # shipping = ShippingAddress.objects.create(
+        #     customer=customer,
+        #     order=order,
+        #     address=data['ShippingAddress']['address'],
+        #     city=data['ShippingAddress']['city'],
+        #     state=data['ShippingAddress']['state'],
+        #     zipcode=data['ShippingAddress']['zipcode']
+        # )
         
 
 

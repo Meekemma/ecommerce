@@ -3,8 +3,11 @@ from rest_framework import status
 from rest_framework.decorators import api_view,permission_classes,parser_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
-from base.serializers import UserSerializer,CustomerSerializer
+from base.serializers import UserSerializer,UserChangePasswordSerializer,CustomerSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
+
+from django.urls import reverse
+
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -41,6 +44,38 @@ def registerUser(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def UserChangePasswordView(request):
+    if request.method == 'PUT':
+            serializer = UserChangePasswordSerializer(data=request.data, context={'user': request.user})
+            if serializer.is_valid():
+                return Response({"detail": "Password successfully changed "}, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                
+
+
+# @api_view(['POST'])
+# def SendPasswordResetEmailView(request):
+#     if request.method == 'POST':
+#         serializer = SendPasswordResetEmailSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# @api_view(['POST'])
+# def UserPasswordResetView(request, uid, token):
+#     if request.method == 'POST':
+#         serializer = UserPasswordResetSerializer(data=request.data, context={'uid':uid, 'token':token})
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
@@ -80,4 +115,10 @@ def createProfile(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+
+
+
 
